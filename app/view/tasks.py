@@ -1,11 +1,9 @@
-from PyQt5.QtWidgets import *
-
-from app.model.taskmodel import TaskModel
+from app.view import *
 
 
 class Tasks(QSplitter):
 
-    items = dict()
+    __items = dict()
 
     def __init__(self):
         super(Tasks, self).__init__()
@@ -70,23 +68,29 @@ class Tasks(QSplitter):
         self.setStyleSheet(css)
 
     def add_items_list(self):
-        item1 = TaskModel("NPM", "No More Pornography", "2/5/2020", None)
-        item2 = TaskModel("ToDo", "ToDo List app", "5/6/2020", None)
-        self.items[f"{item1.get_name()}"] = item1
-        self.items[f"{item2.get_name()}"] = item2
-        self.__tasks.addItems(self.items.keys())
+        self.__items = control.Controller.load_tasks()
+        self.__tasks.addItems(self.__items.keys())
         self.__tasks.setSelectionMode(QListWidget.SingleSelection)
         self.__tasks.clicked.connect(self.item_changed)
 
     def item_changed(self):
         self.__tasks.currentItem()
         sender = self.sender()
-        item = self.items[sender.currentItem().text()]
-        self.__task_f.setText(item.get_name())
-        self.__desc_f.setText(item.get_description())
-        self.__due.setText(f"Due: {item.get_due()}")
+        try:
+            item = self.__items[sender.currentItem().text()]
+            self.__task_f.setText(item.get_name())
+            self.__desc_f.setText(item.get_description())
+            self.__due.setText(f"Due: {item.get_due()}")
+        except KeyError:
+            self.__items = control.Controller.load_tasks()
+            item = self.__items[sender.currentItem().text()]
+            self.__task_f.setText(item.get_name())
+            self.__desc_f.setText(item.get_description())
+            self.__due.setText(f"Due: {item.get_due()}")
 
     def setup(self):
+        control.Controller.set_list(self.__tasks)
+
         #   Frames
         self.__right_section.setFrameShape(QFrame.Panel)
         self.__right_section.setFrameShadow(QFrame.Sunken)
@@ -97,3 +101,5 @@ class Tasks(QSplitter):
         self.__task_f.setReadOnly(True)
         self.__desc_f.setReadOnly(True)
         self.__due.setReadOnly(True)
+
+        self.__tasks.setSpacing(5)

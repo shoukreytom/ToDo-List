@@ -1,4 +1,4 @@
-from app.model import DATABASE_PATH
+from app.model import DATABASE_PATH, model
 
 import sqlite3
 
@@ -50,10 +50,19 @@ class Database:
 
     @staticmethod
     def load_tasks():
+        storage = list()
         Database.__connect()
         statement = "SELECT * FROM tasks"
         global __DB
         __DB.row_factory = sqlite3.Row
         result = __DB.execute(statement)
+        # Database.__disconnect()
+        for row in result.fetchall():
+            id_ = row["id"]
+            task = row["task"]
+            desc = row["description"]
+            due = row["due"]
+            label = row["label"]
+            storage.append(model.TaskModel(task, desc, due, label, id_=id_))
         Database.__disconnect()
-        return result
+        return storage

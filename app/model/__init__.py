@@ -1,4 +1,5 @@
 import os
+import app.model.taskmodel as model
 
 HOME_PATH = os.path.join(os.environ['HOME'], ".tdl")
 if not os.path.exists(HOME_PATH):
