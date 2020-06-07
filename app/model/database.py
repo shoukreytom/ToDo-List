@@ -25,6 +25,7 @@ class Database:
             __DB.close()
             print("Database is disconnected")
 
+    # finished
     @staticmethod
     def add_task(name, description, due, label):
         statement = "INSERT INTO tasks(task, description, due, label) VALUES(?,?,?,?)"
@@ -50,11 +51,3 @@ class Database:
         __DB.row_factory = sqlite3.Row
         result = __DB.execute(statement)
         return result
-
-
-db = Database()
-db.connect()
-# db.add_task("Task1", "This is task1", "20/2/2021", "Personal")
-# db.delete_task(1)
-print(db.load_tasks())
-db.disconnect()

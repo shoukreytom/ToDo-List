@@ -1,10 +1,14 @@
 class TaskModel:
 
-    def __init__(self, name, description, due, label):
+    def __init__(self, name, description, due, label, id_=None):
+        self.__id = id_
         self.__name = str(name)
         self.__description = str(description)
         self.__due = str(due)
         self.__label = str(label)
+
+    def get_id(self):
+        return self.__id
 
     def get_name(self):
         return self.__name

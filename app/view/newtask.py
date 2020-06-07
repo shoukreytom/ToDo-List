@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 from datetime import *
+from app.view import *
 
 
 class NewTask(QFrame):
@@ -161,7 +162,10 @@ class NewTask(QFrame):
             due = self.date.text()
         elif istomorrow:
             due = date(due.year, due.month, due.day+1)
-        print(due)
+        type_ = self.type_options.currentText()
+        new_task = model.TaskModel(task, desc, due, type_)
+        controller = control.Controller()
+        controller.add_task(new_task)
 
     def __close_calendar(self):
         self.date.setChecked(True)
