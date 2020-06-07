@@ -10,9 +10,7 @@ class Controller:
         description = model.get_description()
         due = model.get_due()
         label = model.get_type()
-        database.Database.connect()
         database.Database.add_task(name, description, due, label)
-        database.Database.disconnect()
 
     def delete_task(self):
         pass
