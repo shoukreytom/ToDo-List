@@ -14,16 +14,18 @@ class NewTask(QFrame):
         self.right_section = QVBoxLayout()
         self.save_layout = QVBoxLayout()
         self.due_layout = QVBoxLayout()
+        self.calendar_layout = QVBoxLayout()
 
         # widgets
         self.new_task = QLineEdit()
         self.task_desc = QTextEdit()
         self.save = QPushButton("Save")
         self.due_bar = QToolBar()
-        self.today = QPushButton("Today")
-        self.tomorrow = QPushButton("Tomorrow")
+        self.today = QToolButton()
+        self.tomorrow = QToolButton()
+        self.menu = QMenu()
         self.calendar = QCalendarWidget()
-        self.date = QDateEdit()
+        self.date = QToolButton()
         self.type_options = QComboBox()
         self.others = QToolBar()
         self.other = QLineEdit()
@@ -35,6 +37,8 @@ class NewTask(QFrame):
         self.stylesheet()
 
     def add_widgets(self):
+        self.menu.setLayout(self.calendar_layout)
+        self.calendar_layout.addWidget(self.calendar)
         self.due_bar.addWidget(self.today)
         self.due_bar.addWidget(self.tomorrow)
         self.due_bar.addWidget(self.date)
@@ -57,25 +61,32 @@ class NewTask(QFrame):
     def setup(self):
         self.other.setPlaceholderText("Add other types")
         self.due_layout.setSpacing(5)
+        self.calendar_layout.setSizeConstraint(QLayout.SetDefaultConstraint)
         self.save_layout.setAlignment(Qt.AlignTop)
+        self.calendar.setGridVisible(True)
+        self.calendar.setAutoFillBackground(True)
+        self.calendar.setStyleSheet("background-color: #464446;")
+        self.menu.setStyleSheet("background-color: #464446;")
 
         # date edit
-        self.date.setDisplayFormat("yyyy-MM-dd")
-        now = datetime.now()
-        year, month, day = now.year, now.month, now.day
-        current_date = QDate(year, month, day)
-        self.date.setDate(current_date)
-        self.date.setCalendarWidget(self.calendar)
-        self.date.setCalendarPopup(True)
-        self.date.hasFocus()
+        # now = datetime.now()
+        # year, month, day = now.year, now.month, now.day
+        # current_date = QDate(year, month, day)
+        self.calendar.selectionChanged.connect(self.__close_calendar)
+        self.date.setMenu(self.menu)
+        self.date.setPopupMode(QToolButton.InstantPopup)
         ############################################
 
         # due buttons (today, tomorrow)
-
+        self.today.setText("Today")
+        self.tomorrow.setText("Tomorrow")
+        self.date.setText("No date set")
         self.today.setCheckable(True)
         self.tomorrow.setCheckable(True)
+        self.date.setCheckable(True)
         self.today.setAutoExclusive(True)
         self.tomorrow.setAutoExclusive(True)
+        self.date.setAutoExclusive(True)
         ############################################
 
         # LineEdit and TextEdit
@@ -109,6 +120,12 @@ class NewTask(QFrame):
                 color: white;
                 font: 18px bold large Serif;
             }
+            QToolButton {
+                background-color: #565456;
+                min-height: 30px;
+                color: white;
+                font: 18px bold large Serif;
+            }
             QListWidget {
                 color: white;
                 font: 16px bold large Serif;
@@ -132,6 +149,7 @@ class NewTask(QFrame):
         text = self.other.text()
         if len(text) > 0 and not text.isspace():
             self.type_options.addItem(text)
+            self.type_options.setCurrentText(text)
 
     def __save(self):
         task = self.new_task.text()
@@ -145,10 +163,10 @@ class NewTask(QFrame):
             due = date(due.year, due.month, due.day+1)
         print(due)
 
-    def __remove(self):
-        today = self.tomorrow.isChecked()
-        tomorrow = self.today.isChecked()
-        if today:
-            self.today.setChecked(False)
-        if tomorrow:
-            self.tomorrow.setChecked(False)
+    def __close_calendar(self):
+        self.date.setChecked(True)
+        selected_date = self.calendar.selectedDate()
+        year, month, day = selected_date.year(), selected_date.month(), selected_date.day()
+        str_date = date(year, month, day)
+        self.date.setText(f"{str_date}")
+        self.menu.close()
