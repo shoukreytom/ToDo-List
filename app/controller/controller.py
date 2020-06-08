@@ -21,8 +21,14 @@ class Controller:
         database.Database.delete_task(id_)
         Controller.refresh()
 
-    def edit_task(self):
-        pass
+    @staticmethod
+    def edit_task(id_, model):
+        name = model.get_name()
+        description = model.get_description()
+        due = model.get_due()
+        label = model.get_type()
+        database.Database.update_task(id_, name, description, due, label)
+        Controller.refresh()
 
     @staticmethod
     def load_tasks():

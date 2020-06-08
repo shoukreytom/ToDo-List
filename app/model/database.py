@@ -36,8 +36,14 @@ class Database:
         print("Task is added successfully")
         Database.__disconnect()
 
-    def update_task(self, old_id, new_name, new_description, new_due, new_label):
-        pass
+    @staticmethod
+    def update_task(old_id, new_name, new_description, new_due, new_label):
+        statement = "UPDATE tasks SET task=?, description=?, due=?, label=? WHERE id=?"
+        Database.__connect()
+        global __DB
+        __DB.execute(statement, (new_name, new_description, new_due, new_label, old_id))
+        __DB.commit()
+        Database.__disconnect()
 
     @staticmethod
     def delete_task(id_):

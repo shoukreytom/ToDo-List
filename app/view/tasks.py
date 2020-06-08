@@ -103,3 +103,28 @@ class Tasks(QSplitter):
         self.__due.setReadOnly(True)
 
         self.__tasks.setSpacing(5)
+        self.__edit.clicked.connect(self.__edit_)
+        self.__delete.clicked.connect(self.__delete_)
+
+    def __edit_(self):
+        text = self.sender().text()
+        if text == "Edit":
+            self.__task_f.setReadOnly(False)
+            self.__desc_f.setReadOnly(False)
+            self.__due.setReadOnly(False)
+            self.__edit.setText("Submit")
+        else:
+            name = self.__task_f.text()
+            desc = self.__desc_f.toPlainText()
+            due = self.__due.text()
+            id_ = self.__items[self.__tasks.currentItem().text()].get_id()
+            label = self.__items[self.__tasks.currentItem().text()].get_type()
+            control.Controller.edit_task(id_, model.TaskModel(name, desc, due, label))
+            self.__task_f.setReadOnly(True)
+            self.__desc_f.setReadOnly(True)
+            self.__due.setReadOnly(True)
+            self.__edit.setText("Edit")
+
+    def __delete_(self):
+        item = self.__tasks.currentItem().text()
+        control.Controller.delete_task(self.__items[item].get_id())

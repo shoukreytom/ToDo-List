@@ -160,8 +160,21 @@ class NewTask(QFrame):
             due = date(due.year, due.month, due.day+1)
         type_ = self.type_options.currentText()
         new_task = model.TaskModel(task, desc, due, type_)
-        controller = control.Controller()
-        controller.add_task(new_task)
+        if self.__validate():
+            controller = control.Controller()
+            controller.add_task(new_task)
+        else:
+            font = QFont()
+            font.setFamily("Serif")
+            font.setBold(True)
+            font.setPointSize(18)
+            message = QMessageBox(self)
+            message.setWindowTitle("Validation Error")
+            message.setInformativeText("Make sure that you've filled all fields or Chosen non-stored task name")
+            message.setStandardButtons(QMessageBox.Close)
+            message.setMinimumSize(200, 200)
+            message.setFont(font)
+            message.show()
 
     def __close_calendar(self):
         self.date.setChecked(True)
@@ -170,3 +183,11 @@ class NewTask(QFrame):
         str_date = date(year, month, day)
         self.date.setText(f"{str_date}")
         self.menu.close()
+
+    def __validate(self):
+        task = self.new_task.text()
+        desc = self.task_desc.toPlainText()
+        items = control.Controller.load_tasks()
+        if task in items.keys():
+            return False
+        return True
